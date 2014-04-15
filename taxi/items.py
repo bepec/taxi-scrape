@@ -5,7 +5,10 @@
 
 from scrapy.item import Item, Field
 
+
 class TaxiItem(Item):
-    # define the fields for your item here like:
-    # name = Field()
-    pass
+    name = Field()
+    fullname = Field()
+    link = Field()
+    place = Field()
+    phones = Field()
