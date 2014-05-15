@@ -6,9 +6,9 @@
 from scrapy.item import Item, Field
 
 
-class TaxiItem(Item):
+class TaxiServiceItem(Item):
     name = Field()
     fullname = Field()
     link = Field()
-    place = Field()
+    location = Field()
     phones = Field()
