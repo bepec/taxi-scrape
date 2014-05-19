@@ -1,11 +1,20 @@
 from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 from scrapy.selector import Selector
+from taxi.items import TaxiServiceItem
 
 
 def generate_urls():
     template = "http://taxi.com.ua/category/{0}"
     return [template.format(num) for num in range(1, 28)]
+
+
+def xpath_one(selector, xpath):
+    return xpath_all(selector, xpath)[0]
+
+
+def xpath_all(selector, xpath):
+    return selector.xpath(xpath).extract()
 
 
 class TaxiComUaSpider(CrawlSpider):
@@ -23,8 +32,15 @@ class TaxiComUaSpider(CrawlSpider):
         sel = Selector(response)
      
         breadcumbs = sel.xpath('//div[@id="DMbreadcumbs"]')
-        location = breadcumbs.xpath('a[2]/text()').extract()[0]
-        name = breadcumbs.xpath('span/text()').extract()[0]
-        phones = sel.xpath('//div[@id="contSingleBlog"]//td[2]/text()').extract()
+        location = xpath_one(breadcumbs, 'a[2]/text()')
+        name = xpath_one(breadcumbs, 'span/text()')
+        phones = xpath_all(sel, '//div[@id="contSingleBlog"]//td[2]/text()')[1:]
 
-        self.log('Item: {0} - {1} - {2}'.format(location, name, phones))
+        print location, name, phones
+
+        item = TaxiServiceItem()
+        item['name'] = name
+        item['location'] = location[6:]
+        item['phones'] = [phone.strip() for phone in phones]
+
+        return item
